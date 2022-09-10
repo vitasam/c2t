@@ -7,6 +7,7 @@ usage:  c2t      [-vh?]\n\
         c2t      [-n8]          input.dsk          ... [output.[aif[f]|wav[e]]]\n\
 \n\
         -1 or -2 for Apple I or II tape format\n\
+        -3 for Microprofessor II (with Apple II tape format)\n\
         -8 use 48k/8bit 8000 bps transfer (Apple II/II+/IIe 64K only)\n\
            Implies -2a.  Negates -f and -d.\n\
         -a assembly autoload and run (Apple II/II+/IIe 64K only)\n\
@@ -76,7 +77,7 @@ unsigned char basic[] = {0x0B,0x08,0x01,0x00,0x8C,0x32,0x30,0x36,0x30,0x00,0x00}
 org     =       $BF00           ; should be $BF00
 cout    =       $FDED           ; character out sub
 crout   =       $FD8E           ; CR out sub
-prbyte  =       $FDDA 
+prbyte  =       $FDDA
 warm    =       $FF69           ; back to monitor
 readblk =       $FEFD
 pointer =       $06
@@ -153,7 +154,7 @@ error:
         lda     #<errm
         ldy     #>errm
         jsr     print
-        jmp     warm    
+        jmp     warm
 print:
         sta     pointer
         sty     pointer+1
@@ -183,7 +184,7 @@ inf_flag:
         .org    *+1
 warm_flag:
         .org    *+1
-loadm:  
+loadm:
         ;.asciiz        "LOADING "
 
 end:
@@ -297,8 +298,8 @@ START:
 ;;      mvy     #0      getBit_buffer
         LDY     #0
         STY     getBit_buffer
-        
-        
+
+
 inflate_blockLoop:
 ; Get a bit of EOF and two bits of block type
 ;       ldy     #0
@@ -428,7 +429,7 @@ inflateDynamicBlock_controlSymbolCodeLength:
 S3:
 ;;      sta     controlSymbolCodeLength,x+
         sta     controlSymbolCodeLength,x
-        INX     
+        INX
 
         cpx     inflateDynamicBlock_allCodes
         bcc     inflateDynamicBlock_storeNext
@@ -807,7 +808,7 @@ unsigned char inflatecode[] = {
 org     =       $BE80           ; should be $BE80
 cout    =       $FDED           ; character out sub
 crout   =       $FD8E           ; CR out sub
-prbyte  =       $FDDA 
+prbyte  =       $FDDA
 warm    =       $FF69           ; back to monitor
 tapein  =       $C060
 pointer =       $06
@@ -863,7 +864,7 @@ store:  sta     store,x         ; Store data byte
         lda     #1              ; Re-load sentinel bit
 waitlo: bit     tapein          ; Wait for input to go low
         bpl     waitlo
-        bcc     poll9           ; Poll at +9 cycles if no store 
+        bcc     poll9           ; Poll at +9 cycles if no store
         inx                     ; Stored, so increment data index
         bne     poll13          ; Poll at +13 cycles if no carry
         inc     store+2         ; Increment data page
@@ -910,7 +911,7 @@ poll21: bit     tapein
         bit     tapein
         bpl     pre             ; pre pulse (99-105 cycles)
 
-endcode:  
+endcode:
         txa                     ; write end of file location + 1
         clc
         adc     store+1
@@ -967,7 +968,7 @@ error:
         lda     #<errm
         ldy     #>errm
         jsr     print
-        jmp     warm    
+        jmp     warm
 print:
         sta     pointer
         sty     pointer+1
@@ -997,7 +998,7 @@ inf_flag:
         .org    *+1
 warm_flag:
         .org    *+1
-loadm:  
+loadm:
         ;.asciiz        "LOADING "
 
 end:
@@ -1054,7 +1055,7 @@ unsigned char fastload9600[] = {
 org     =       $BE80           ; should be $BE80
 cout    =       $FDED           ; character out sub
 crout   =       $FD8E           ; CR out sub
-prbyte  =       $FDDA 
+prbyte  =       $FDDA
 warm    =       $FF69           ; back to monitor
 tapein  =       $C060
 pointer =       $06
@@ -1092,14 +1093,14 @@ fast:
         sta     store+2         ; store it
 
         ldx     #0              ; set X to 0
-        lda     #1              ; set A to 0 
+        lda     #1              ; set A to 0
 
 nsync:  bit     tapein          ; 4 cycles, sync bit ; first pulse
         bpl     nsync           ; 2 + 1 cycles
 
-main:   ldy     #0              ; 2 set Y to 0 
+main:   ldy     #0              ; 2 set Y to 0
 
-psync:  bit     tapein          ; 
+psync:  bit     tapein          ;
         bmi     psync
 
 ploop:  iny                     ; 2 cycles
@@ -1125,7 +1126,7 @@ store:  rol     store+1,x       ; 7, roll carry bit into store
         jmp     main            ; 3 cycles
                                 ; 34 subtotal max
                                 ; 36 subtotal max
-endcode:  
+endcode:
         txa                     ; write end of file location + 1
         clc
         adc     store+1
@@ -1208,7 +1209,7 @@ error:
         lda     #<errm
         ldy     #>errm
         jsr     print
-        jmp     warm    
+        jmp     warm
 print:
         sta     pointer
         sty     pointer+1
@@ -1238,7 +1239,7 @@ inf_flag:
         .org    *+1
 warm_flag:
         .org    *+1
-loadm:  
+loadm:
         ;.asciiz        "LOADING "
 
 end:
@@ -1289,7 +1290,7 @@ unsigned char fastload8000[] = {
 org     =       $BE80           ; should be $BE80
 cout    =       $FDED           ; character out sub
 crout   =       $FD8E           ; CR out sub
-prbyte  =       $FDDA 
+prbyte  =       $FDDA
 warm    =       $FF69           ; back to monitor
 tapein  =       $C060
 pointer =       $06
@@ -1345,7 +1346,7 @@ store:  sta     store,x         ; Store data byte
         lda     #1              ; Re-load sentinel bit
 waitlo: bit     tapein          ; Wait for input to go low
         bpl     waitlo
-        bcc     poll9           ; Poll at +9 cycles if no store 
+        bcc     poll9           ; Poll at +9 cycles if no store
         inx                     ; Stored, so increment data index
         bne     poll13          ; Poll at +13 cycles if no carry
         inc     store+2         ; Increment data page
@@ -1394,7 +1395,7 @@ poll21: bit     tapein
         bit     tapein
         bpl     pre             ; pre pulse (99-111 cycles)
 
-endcode:  
+endcode:
         txa                     ; write end of file location + 1
         clc
         adc     store+1
@@ -1451,7 +1452,7 @@ error:
         lda     #<errm
         ldy     #>errm
         jsr     print
-        jmp     warm    
+        jmp     warm
 print:
         sta     pointer
         sty     pointer+1
@@ -1481,7 +1482,7 @@ inf_flag:
         .org    *+1
 warm_flag:
         .org    *+1
-loadm:  
+loadm:
         ;.asciiz        "LOADING "
 
 end:
@@ -1613,7 +1614,7 @@ store:  sta     target,x        ; Store data byte
         lda     #1              ; Re-load sentinel bit
 waitlo: bit     tapein          ; Wait for input to go low
         bpl     waitlo
-        bcc     poll9           ; Poll at +9 cycles if no store 
+        bcc     poll9           ; Poll at +9 cycles if no store
         inx                     ; Stored, so increment data index
         bne     poll13          ; Poll at +13 cycles if no carry
         inc     store+2         ; Increment data page
@@ -1661,7 +1662,7 @@ poll21: bit     tapein
         bpl     pre             ; pre pulse (99-105 cycles)
 
                                 ; low freq signals end of data
-endcode:  
+endcode:
         txa                     ; write end of file location + 1
         clc
         adc     store+1
@@ -1688,7 +1689,7 @@ error:
         lda     #<errm
         ldy     #>errm
         jsr     print
-        jmp     warm    
+        jmp     warm
 ok:
         lda     #<okm
         ldy     #>okm
@@ -1814,14 +1815,14 @@ readtape:
         sta     store+2         ; store it
 
         ldx     #0              ; set X to 0
-        lda     #1              ; set A to 0 
+        lda     #1              ; set A to 0
 
 nsync:  bit     tapein          ; 4 cycles, sync bit ; first pulse
         bpl     nsync           ; 2 + 1 cycles
 
-main:   ldy     #0              ; 2 set Y to 0 
+main:   ldy     #0              ; 2 set Y to 0
 
-psync:  bit     tapein          ; 
+psync:  bit     tapein          ;
         bmi     psync
 
 ploop:  iny                     ; 2 cycles
@@ -1847,7 +1848,7 @@ store:  rol     store+1,x       ; 7, roll carry bit into store
         jmp     main            ; 3 cycles
                                 ; 34 subtotal max
                                 ; 36 subtotal max
-endcode:  
+endcode:
         txa                     ; write end of file location + 1
         clc
         adc     store+1
@@ -1901,7 +1902,7 @@ error:
         lda     #<errm
         ldy     #>errm
         jsr     print
-        jmp     warm    
+        jmp     warm
 ok:
         lda     #<okm
         ldy     #>okm
@@ -2709,8 +2710,8 @@ START:
 ;;      mvy     #0      getBit_buffer
         LDY     #0
         STY     getBit_buffer
-        
-        
+
+
 inflate_blockLoop:
 ; Get a bit of EOF and two bits of block type
 ;       ldy     #0
@@ -2840,7 +2841,7 @@ inflateDynamicBlock_controlSymbolCodeLength:
 S3:
 ;;      sta     controlSymbolCodeLength,x+
         sta     controlSymbolCodeLength,x
-        INX     
+        INX
 
         cpx     inflateDynamicBlock_allCodes
         bcc     inflateDynamicBlock_storeNext
@@ -3214,7 +3215,7 @@ unsigned char diskloadcode3[] = {
 	0x08,0x07,0x09,0x06,0x0A,0x05,0x0B,0x04,
 	0x0C,0x03,0x0D,0x02,0x0E,0x01,0x0F,0x88,
 	0x90,0x90,0x03,0x00,0x00,0x00,0x00,0x00
-	
+
 };
 
 //DOS 3.3

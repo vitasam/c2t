@@ -4,7 +4,7 @@ c2t, Code to Tape|Text, Version 0.997, Wed Sep 27 15:27:56 GMT 2017
 
 Parts copyright (c) 2011-2017 All Rights Reserved, Egan Ford (egan@sense.net)
 
-THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY 
+THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY
 KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 PARTICULAR PURPOSE.
@@ -92,7 +92,7 @@ Bugs:
 #define MONITOR 1
 #define AIFF 2
 #define WAVE 3
-#define DSK 4 
+#define DSK 4
 
 #define WRITEBYTE(x) { \
 	unsigned char wb_j, wb_temp=(x); \
@@ -130,7 +130,7 @@ int main(int argc, char **argv)
 	FILE *ofp;
 	double *output = NULL, amp=0.75;
 	long outputlength=0;
-	int i, c, model=0, outputtype, offset=0, fileoutput=1, warm=0, dsk=0, noformat=0, k8=0, qr=0;
+	int i, c, model=0, clone_model=0, outputtype, offset=0, fileoutput=1, warm=0, dsk=0, noformat=0, k8=0, qr=0;
 	int autoload=0, basicload=0, compress=0, fast=0, cd=0, tape=0, endpage=0, longmon=0, rate=11025, bits=8, freq0=2000, freq1=1000, freq_pre=770, freq_end=770;
 	char *filetypes[] = {"binary","monitor","aiff","wave","disk"};
 	char *modeltypes[] = {"\b","I","II"};
@@ -139,7 +139,7 @@ int main(int argc, char **argv)
 	segment *segments = NULL;
 
 	opterr = 1;
-	while((c = getopt(argc, argv, "12vabcftdpn8meh?lqr:")) != -1)
+	while((c = getopt(argc, argv, "123vabcftdpn8meh?lqr:")) != -1)
 		switch(c) {
 			case '1':		// apple 1
 				rate = 8000;
@@ -147,6 +147,10 @@ int main(int argc, char **argv)
 				break;
 			case '2':		// apple 2
 				model = 2;
+				break;
+			case '3':		// microprofessor 2 with apple 2 tape format
+				model = 2;
+				clone_model = 2;
 				break;
 			case 'v':		// version
 				fprintf(stderr,"\n%s\n\n",VERSION);
@@ -185,7 +189,7 @@ int main(int argc, char **argv)
 			case 'm':		// drop to monitor after load
 				warm = 1;
 				break;
-			case 'e':		// end on page boundary 
+			case 'e':		// end on page boundary
 				endpage = 1;
 				break;
 			case 'p':		// stdout
@@ -352,7 +356,7 @@ int main(int argc, char **argv)
 				naddr = (int)strtol(addrs, (char **)NULL, 16);
 				if(segments[numseg].start == -1)
 					segments[numseg].start = naddr;
-	
+
 				if(naddr != segments[numseg].start + segments[numseg].length) { // multi segment
 					segments[numseg].data = data;
 					fprintf(stderr,"0x%04X, length: %d\n",segments[numseg].start,segments[numseg].length);
@@ -371,7 +375,7 @@ int main(int argc, char **argv)
 					strcpy(segments[numseg].filename,segments[numseg-1].filename);
 					fprintf(stderr,"Reading %s, type %s, segment %d, start: ",segments[numseg].filename,filetypes[inputtype],numseg+1);
 				}
-	
+
 				while (fscanf(ifp, "%x%c", &byte, &s) != EOF) {
 					data[segments[numseg].length++]=byte;
 					if (s == '\n' || s == '\r')
@@ -401,7 +405,7 @@ int main(int argc, char **argv)
 					fprintf(stderr,"Number of segments != 5 and/or not of length %d\n\n",140*1024/5);
 					return 1;
 				}
-			}	
+			}
 		}
 	}
 
@@ -524,7 +528,7 @@ int main(int argc, char **argv)
 				WRITEBYTE(segments[i].data[j]);
 				checksum ^= segments[i].data[j];
 			}
-	
+
 			// checksum/endbits
 			if(model == 2)
 				WRITEBYTE(checksum);
@@ -663,7 +667,7 @@ int main(int argc, char **argv)
 			ram[0x0] = (0xBA00 - cmp_len) & 0xFF;
 			ram[0x1] = (0xBA00 - cmp_len) >> 8;
 			//zero page dst
-			ram[0x2] = (segments[0].start) & 0xFF; 
+			ram[0x2] = (segments[0].start) & 0xFF;
 			ram[0x3] = (segments[0].start) >> 8;
 			//setup JSR
 			ram[0xBF00] = 0x20; // JSR $9B00
@@ -1137,7 +1141,7 @@ int main(int argc, char **argv)
 			unsigned char checksum=0xff;
 
 			inflate_times[i] = 0;
-			
+
 			cmp_data = tdefl_compress_mem_to_heap(segments[i].data, segments[i].length, &cmp_len, TDEFL_MAX_PROBES_MASK);
 
 			//compute inflate time
