@@ -465,10 +465,16 @@ int main(int argc, char **argv)
 			fprintf(stderr,"\nCannot write: %s\n\n",OUTFILE);
 			return 1;
 		}
-		fprintf(stderr,"Writing %s as Apple %s formatted %s.\n\n",OUTFILE,modeltypes[model],filetypes[outputtype]);
+		if (clone_model == 2)
+            fprintf(stderr,"Writing %s as MPF-II Apple %s formatted %s.\n\n",OUTFILE,modeltypes[model],filetypes[outputtype]);
+        else
+            fprintf(stderr,"Writing %s as Apple %s formatted %s.\n\n",OUTFILE,modeltypes[model],filetypes[outputtype]);
 	}
 	else
-		fprintf(stderr,"Writing %s as Apple %s formatted %s.\n\n","STDOUT",modeltypes[model],filetypes[outputtype]);
+        if (clone_model == 2)
+            fprintf(stderr,"Writing %s as MPF-II Apple %s formatted %s.\n\n","STDOUT",modeltypes[model],filetypes[outputtype]);
+        else
+            fprintf(stderr,"Writing %s as Apple %s formatted %s.\n\n","STDOUT",modeltypes[model],filetypes[outputtype]);
 
 	if(outputtype == MONITOR) {
 		int i, j, saddr;
@@ -536,14 +542,24 @@ int main(int argc, char **argv)
 		}
 
 		// friendly help
-		fprintf(stderr,"To load up and run on your Apple %s, type:\n\n",modeltypes[model]);
+		if (clone_model == 2)
+            fprintf(stderr,"To load up and run on your MPF-II, type:\n\n");
+        else
+            fprintf(stderr,"To load up and run on your Apple %s, type:\n\n",modeltypes[model]);
+
 		if(model == 1)
 			fprintf(stderr,"\tC100R\n\t");
 		else
-			fprintf(stderr,"\tCALL -151\n\t");
+            if (clone_model == 2)
+                fprintf(stderr,"\tCALL -159\n\t");
+            else
+                fprintf(stderr,"\tCALL -151\n\t");
 
 		for(i=0;i<numseg;i++)
-			fprintf(stderr,"%X.%XR ",segments[i].start,segments[i].start+segments[i].length-1);
+            if (clone_model == 2)
+                fprintf(stderr,"%X.%XRA ",segments[i].start,segments[i].start+segments[i].length-1);
+            else
+                fprintf(stderr,"%X.%XR ",segments[i].start,segments[i].start+segments[i].length-1);
 		fprintf(stderr,"\n");
 
 		if(numseg == 1) {
